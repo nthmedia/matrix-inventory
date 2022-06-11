@@ -7,39 +7,33 @@ use Craft;
 use craft\elements\Entry;
 use craft\web\Controller;
 use nthmedia\MatrixInventory\MatrixInventoryPlugin;
+use nthmedia\MatrixInventory\settings\Settings;
 use yii\base\Exception;
 use yii\web\Response;
 
 class MatrixInventoryController extends Controller
 {
     protected $allowAnonymous = false;
-
-//    protected array $settings = [];
-    protected array $matrixFields = [];
-    protected array $sites = [];
+    protected ?Settings $settings = null;
 
     public function beforeAction($action): bool
     {
-        $settings = MatrixInventoryPlugin::getInstance()->settings;
-        
-        $this->matrixFields = $settings['matrixFields'];
-        $this->sites = $settings['sites'];
-        
+        $this->settings = MatrixInventoryPlugin::getInstance()->settings;
         return parent::beforeAction($action);
     }
 
     public function actionIndex(): Response
     {
         return $this->renderTemplate('matrix-inventory/index', [
-            'matrixFields' => $this->matrixFields
+            'matrixFields' =>  $this->settings->matrixFields
         ]);
     }
 
     public function actionMatrix(string $key): Response
     {
-        $matrixField = $this->matrixFields[strtolower($key)] ?? throw new Exception("Matrix with key '${key}' not found.");
+        $matrixField = $this->settings->matrixFields[strtolower($key)] ?? throw new Exception("Matrix with key '${key}' not found.");
 
-        $query = $this->getMatrixDataQuery($matrixField['fieldId'], $matrixField['matrixTableName']);
+        $query = $this->getMatrixDataQuery($matrixField->fieldId, $matrixField->tableName);
 
         $result = collect($query->queryAll())
             ->groupBy(['handle', 'siteId', function ($item) {
@@ -53,10 +47,9 @@ class MatrixInventoryController extends Controller
             ->toArray();
 
         return $this->renderTemplate('matrix-inventory/matrix', [
-            'key' => $key,
             'matrixField' => $matrixField,
             'blocks' => $result,
-            'sites' => $this->sites
+            'sites' => $this->settings->sites
         ]);
     }
 

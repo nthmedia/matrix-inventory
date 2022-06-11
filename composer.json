@@ -14,12 +14,19 @@
     }
   ],
   "require": {
+    "php": "^8.0",
     "craftcms/cms": "^3.1.0",
-    "illuminate/collections": "^8.0"
+    "illuminate/collections": "^9.0"
   },
   "extra": {
     "name": "Matrix Inventory",
     "handle": "matrix-inventory",
     "class": "nthmedia\\MatrixInventory\\MatrixInventoryPlugin"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
   }
 }

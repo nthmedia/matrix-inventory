@@ -4,9 +4,13 @@ namespace nthmedia\MatrixInventory;
 
 use Craft;
 use craft\base\Plugin;
+use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\UrlManager;
+use craft\web\View;
+use nthmedia\MatrixInventory\settings\Settings;
 use yii\base\Event;
+use yii\base\Exception;
 
 class MatrixInventoryPlugin extends Plugin
 {
@@ -15,9 +19,7 @@ class MatrixInventoryPlugin extends Plugin
      */
     public static $plugin;
 
-    /**
-     * @var array
-     */
+    /** @var ?Settings */
     public $settings;
 
     // Public Properties
@@ -45,12 +47,24 @@ class MatrixInventoryPlugin extends Plugin
     {
         parent::init();
         self::$plugin = $this;
-        $this->settings = Craft::$app->config->getConfigFromFile('matrix-inventory');
+
+        // Base template directory
+        Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS, function (RegisterTemplateRootsEvent $e) {
+            if (is_dir($baseDir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'templates')) {
+                $e->roots[$this->id] = $baseDir;
+            }
+        });
 
         $this->registerCPRules();
+
+        try {
+            $this->settings = (new Settings())->loadSettings();
+        } catch (\Throwable $exception) {
+            throw new Exception("Invalid matrix-inventory configuration file structure");
+        }
     }
 
-    private function registerCPRules()
+    private function registerCPRules(): void
     {
         Event::on(
             UrlManager::class,
@@ -75,10 +89,10 @@ class MatrixInventoryPlugin extends Plugin
             ],
         ];
 
-        foreach ($this->settings['matrixFields'] as $key => $option) {
-            $item['subnav']['matrix-inventory-' . $key] = [
-                'label' => $option['label'],
-                'url' => 'matrix-inventory/view/' . $key,
+        foreach ($this->settings->matrixFields as $matrixField) {
+            $item['subnav']['matrix-inventory-' . $matrixField->key] = [
+                'label' => $matrixField->label,
+                'url' => 'matrix-inventory/view/' . $matrixField->key,
             ];
         }
 

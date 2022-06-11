@@ -1,0 +1,25 @@
+{
+  "name": "nthmedia/matrix-inventory",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {
+      "nthmedia\\MatrixInventory\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Niek ten Hoopen",
+      "email": "niek@nthmedia.nl"
+    }
+  ],
+  "require": {
+    "craftcms/cms": "^3.1.0",
+    "illuminate/collections": "^8.0"
+  },
+  "extra": {
+    "name": "Matrix Inventory",
+    "handle": "matrix-inventory",
+    "class": "nthmedia\\MatrixInventory\\MatrixInventoryPlugin"
+  }
+}

@@ -1,0 +1,37 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'Matrix Inventory: ' ~ matrixField.label %}
+{% set selectedSubnavItem = 'matrix-inventory-' ~ key %}
+
+{% set content %}
+    <table style="margin-bottom: 2rem">
+        <thead>
+        <tr>
+            <th>Block Type</th>
+            {% for site in sites %}
+                <th>{{ site.label }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+            {% for index, data in blocks %}
+                <tr>
+                    <td style="vertical-align: top;">{{ index }}</td>
+                    {% for site in sites %}
+                        <td style="vertical-align: top;">
+                            <ul style="list-style: disc; margin-left: 20px;">
+                                {% for key, item in data[site.value] ?? [] %}
+                                    {% set count = item | length %}
+                                    <li>
+                                        <a href="/admin/matrix-inventory/redirect/{{ site.value }}/{{ item[0].entryId }}" target="_blank">{{ key }}</a> {% if count > 1 %}({{ item | length }}x){% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    {% endfor %}
+                </tr>
+        {% endfor %}
+        </tbody>
+    <table>
+
+{% endset %}

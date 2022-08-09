@@ -13,7 +13,7 @@ use yii\web\Response;
 
 class MatrixInventoryController extends Controller
 {
-    protected $allowAnonymous = false;
+    protected array|int|bool $allowAnonymous = false;
     protected ?Settings $settings = null;
 
     public function beforeAction($action): bool
@@ -75,7 +75,7 @@ class MatrixInventoryController extends Controller
                 entryquery.slug
             FROM (
                 SELECT
-                    matrixblocks.ownerId AS entryId,
+                    matrixblocks.primaryOwnerId AS entryId,
                     elements_sites.siteId,
                     matrixblocktypes.handle
                 FROM

@@ -23,7 +23,7 @@
                                 {% for key, item in data[site.siteId] ?? [] %}
                                     {% set count = item | length %}
                                     <li>
-                                        <a href="{{ cpUrl() }}/matrix-inventory/redirect/{{ site.siteId }}/{{ item[0].entryId }}" target="_blank">{{ key }}</a> {% if count > 1 %}({{ item | length }}x){% endif %}
+                                        <a href="{{ cpUrl('matrix-inventory/redirect/' ~ site.siteId ~ '/' ~ item[0].entryId) }}" target="_blank">{{ key }}</a> {% if count > 1 %}({{ item | length }}x){% endif %}
                                     </li>
                                 {% endfor %}
                             </ul>

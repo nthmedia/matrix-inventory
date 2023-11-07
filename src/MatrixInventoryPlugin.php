@@ -4,11 +4,15 @@ namespace nthmedia\MatrixInventory;
 
 use Craft;
 use craft\base\Plugin;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\helpers\UrlHelper;
+use craft\services\Utilities;
 use craft\web\UrlManager;
 use craft\web\View;
 use nthmedia\MatrixInventory\settings\Settings;
+use nthmedia\MatrixInventory\utilities\MatrixInventoryUtility;
 use yii\base\Event;
 use yii\base\Exception;
 
@@ -38,7 +42,7 @@ class MatrixInventoryPlugin extends Plugin
     /**
      * @var bool
      */
-    public bool $hasCpSection = true;
+    public bool $hasCpSection = false;
 
     /**
      * @inheritdoc
@@ -55,6 +59,7 @@ class MatrixInventoryPlugin extends Plugin
             }
         });
 
+        $this->_registerUtilities();
         $this->registerCPRules();
 
         try {
@@ -62,6 +67,26 @@ class MatrixInventoryPlugin extends Plugin
         } catch (\Throwable $exception) {
             throw new Exception("Invalid matrix-inventory configuration file structure");
         }
+    }
+
+    /**
+     * Register utilities.
+     */
+    private function _registerUtilities(): void
+    {
+        // If not a web request, bail
+        if (!Craft::$app->getRequest()->getIsCpRequest()) {
+            return;
+        }
+
+        // Load utilities
+        Event::on(
+            Utilities::class,
+            Utilities::EVENT_REGISTER_UTILITY_TYPES,
+            static function(RegisterComponentTypesEvent $event) {
+                $event->types[] = MatrixInventoryUtility::class;
+            }
+        );
     }
 
     private function registerCPRules(): void
@@ -92,7 +117,7 @@ class MatrixInventoryPlugin extends Plugin
         foreach ($this->settings->matrixFields as $matrixField) {
             $item['subnav']['matrix-inventory-' . $matrixField->key] = [
                 'label' => $matrixField->label,
-                'url' => 'matrix-inventory/view/' . $matrixField->key,
+                'url' => UrlHelper::cpUrl('matrix-inventory/view/' . $matrixField->key),
             ];
         }
 

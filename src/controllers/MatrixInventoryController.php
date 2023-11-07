@@ -66,7 +66,7 @@ class MatrixInventoryController extends Controller
 
     private function getMatrixDataQuery(int $fieldId, string $matrixTableName)
     {
-        return Craft::$app->db->createCommand("
+        $query = Craft::$app->db->createCommand("
             SELECT
                 matrixquery.entryId,
                 matrixquery.siteId,
@@ -128,5 +128,7 @@ class MatrixInventoryController extends Controller
                 "fieldId" => $fieldId,
                 "now" => (string) Carbon::now()
             ]);
+
+        return $query;
     }
 }

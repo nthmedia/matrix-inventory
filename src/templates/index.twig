@@ -1,14 +1,12 @@
-{% extends "_layouts/cp" %}
-
 {% set title = "Matrix Inventory" %}
 
-{% set content %}
+{% block content %}
     <h2>Matrix Block Types</h2>
     <ul style="margin-left: 20px; list-style: disc;">
         {% for matrixField in matrixFields %}
             <li>
-                <a href="{{ cpUrl() }}/matrix-inventory/view/{{ matrixField.key }}">{{ matrixField.label }}</a>
+                <a href="{{ cpUrl('matrix-inventory/view/' ~ matrixField.key) }}">{{ matrixField.label }}</a>
             </li>
         {% endfor %}
     </ul>
-{% endset %}
+{% endblock %}
